@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FN Accounts • Instant Delivery</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root{
+      --primary:#3b82f6;
+      --active:#60a5fa;
+      --dark:#0b1220;
+      --card:#111a2e;
+      --text:#d6e2ff;
+      --accent:#a7b6d9;
+      --border:rgba(167,182,217,.28);
+      --danger:#ff4d4d;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background:
+        radial-gradient(1200px 800px at 50% -10%, rgba(59,130,246,.20), transparent 60%),
+        radial-gradient(900px 600px at 10% 0%, rgba(96,165,250,.15), transparent 55%),
+        linear-gradient(180deg, rgba(0,0,0,.35), transparent 30%),
+        var(--dark);
+      color:var(--text);
+      line-height:1.6;
+      overflow-x:hidden;
+    }
+
+    .glow-orb{
+      position:fixed; inset:auto auto 8% -140px;
+      width:360px;height:360px;border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(59,130,246,.38), transparent 62%);
+      filter: blur(10px);
+      z-index:-1;
+      animation: floaty 8s ease-in-out infinite;
+    }
+    .glow-orb.two{
+      inset: -150px -160px auto auto;
+      width:420px;height:420px;
+      background: radial-gradient(circle at 40% 40%, rgba(96,165,250,.25), transparent 66%);
+      animation-duration: 11s;
+    }
+    @keyframes floaty{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(34px,-18px)} }
+
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(to bottom, rgba(0,0,0,.70), rgba(11,18,32,.62));
+      border-bottom: 1px solid var(--border);
+    }
+    .head-inner{
+      max-width:1200px; margin:0 auto; padding: 18px 20px;
+      display:flex; gap:14px; align-items:center; justify-content:space-between;
+    }
+    .brand{
+      display:flex; gap:12px; align-items:center;
+      cursor:pointer; user-select:none;
+      transition: transform .18s ease;
+    }
+    .brand:hover{ transform: translateY(-1px); }
+    .brand-badge{
+      width:44px;height:44px;border-radius:14px;
+      background: linear-gradient(135deg, rgba(59,130,246,.35), rgba(96,165,250,.18));
+      border:1px solid rgba(96,165,250,.35);
+      display:grid; place-items:center;
+      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+    }
+    .brand-badge i{ color: var(--primary); font-size: 1.2rem; }
+    .brand h1{ font-size:1.2rem; line-height:1.1; color: var(--active); letter-spacing:.2px; }
+    .brand p{ font-size:.9rem; opacity:.86; }
+
+    .nav{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .pill{
+      background: rgba(17,26,46,.92);
+      border:1px solid rgba(96,165,250,.35);
+      color: #cfe0ff;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:900;
+      cursor:pointer;
+      display:flex; gap:8px; align-items:center;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+      user-select:none;
+    }
+    .pill:hover{
+      transform: translateY(-2px);
+      background: rgba(96,165,250,.22);
+      box-shadow: 0 14px 35px rgba(0,0,0,.38);
+    }
+    .pill:active{ transform: translateY(0) scale(.98) }
+
+    .cart-pill{ position:relative; padding-right:18px; }
+    .badge{
+      position:absolute; top:-8px; right:-6px;
+      background: var(--danger);
+      color:#fff;
+      border-radius:999px;
+      padding: 2px 8px;
+      font-size:.75rem;
+      font-weight:1000;
+      border: 2px solid rgba(11,18,32,.95);
+      transform-origin: center;
+    }
+    .badge.bump{ animation: bump .35s ease; }
+    @keyframes bump{ 0%{transform:scale(1)} 30%{transform:scale(1.2)} 100%{transform:scale(1)} }
+
+    .hero{
+      max-width:1200px; margin:0 auto;
+      padding: 12px 20px 18px;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .hero h2{
+      font-size:2rem;
+      color:#fff;
+      letter-spacing:.2px;
+    }
+    .hero h2 span{ color: var(--active) }
+    .hero .sub{ opacity:.9; max-width: 980px; }
+
+    .container{ max-width:1200px; margin:0 auto; padding: 0 20px 80px; }
+
+    .page{ display:none; padding: 18px 0 80px; }
+    .page.active{ display:block; }
+    .page-enter{ animation: pageIn .35s ease both; }
+    @keyframes pageIn{ from{opacity:0; transform: translateY(12px)} to{opacity:1; transform: translateY(0)} }
+
+    .panel{
+      background: rgba(17,26,46,.92);
+      border:1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+    }
+    .panel h3{ color: var(--active); margin-bottom: 6px; }
+    .muted{ opacity:.85; }
+
+    .filters{
+      display:grid;
+      grid-template-columns: 1.3fr .7fr .7fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .field{
+      display:flex; align-items:center; gap:10px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.18);
+    }
+    .field i{ color: var(--active); }
+    .field input, .field select{
+      width:100%;
+      background: transparent;
+      border:none;
+      outline:none;
+      color: var(--text);
+      font-weight:900;
+    }
+    .field select option{ color:#0b1220; }
+
+    .hint{
+      margin-top:10px;
+      font-size:.95rem;
+      opacity:.9;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .kbd{
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.18);
+      padding: 4px 8px;
+      border-radius: 10px;
+      font-weight:1000;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+    }
+
+    .card{
+      position:relative;
+      overflow:hidden;
+      border-radius:18px;
+      background: rgba(17,26,46,.95);
+      border:1px solid var(--border);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .card:hover{
+      transform: translateY(-8px);
+      box-shadow: 0 20px 55px rgba(0,0,0,.42);
+      border-color: rgba(96,165,250,.45);
+    }
+
+    /* ✅ NOT CLOSEUP */
+    .card img{
+      width:100%;
+      height:220px;
+      object-fit: contain;
+      padding: 14px;
+      border-bottom:1px solid var(--border);
+      background:
+        radial-gradient(600px 220px at 50% 30%, rgba(96,165,250,.18), transparent 60%),
+        rgba(0,0,0,.14);
+      transition: transform .35s ease;
+    }
+    .card:hover img{ transform: scale(1.03); }
+
+    .card .body{ padding: 16px; }
+    .card h4{ color: #eaf1ff; font-size:1.25rem; margin-bottom:6px; }
+    .price{
+      font-size:1.6rem;
+      font-weight:1000;
+      color: var(--active);
+      margin: 10px 0 12px;
+    }
+    .mini{ font-size:.92rem; opacity:.9; display:flex; gap:10px; flex-wrap:wrap; }
+
+    .chip{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(96,165,250,.30);
+      background: rgba(96,165,250,.12);
+      color: #dce9ff;
+      font-weight:900;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease;
+      user-select:none;
+    }
+    .chip:hover{ transform: translateY(-1px); background: rgba(96,165,250,.18) }
+    .chip:active{ transform: translateY(0) scale(.98) }
+
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding: 12px 14px;
+      font-weight:1000;
+      cursor:pointer;
+      transition: transform .16s ease, box-shadow .16s ease, opacity .16s ease;
+      user-select:none;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+    }
+    .btn:hover{ transform: translateY(-2px); box-shadow: 0 14px 35px rgba(0,0,0,.38) }
+    .btn:active{ transform: translateY(0) scale(.98) }
+    .btn-primary{ background: var(--primary); color:#041022 }
+    .btn-accent{ background: var(--active); color:#041022 }
+    .btn-muted{ background:#2a3553; color:#fff }
+    .btn-danger{ background: var(--danger); color:#fff }
+
+    .row{
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .row:last-child{ border-bottom:none }
+    .qty{ display:flex; gap:10px; align-items:center; white-space:nowrap; }
+    .qty-btn{
+      width:34px; height:34px;
+      border-radius:999px;
+      border:none;
+      background: var(--active);
+      color:#041022;
+      font-weight:1000;
+      cursor:pointer;
+      transition: transform .12s ease;
+    }
+    .qty-btn:active{ transform: scale(.96) }
+    .trash{
+      color: var(--danger);
+      cursor:pointer;
+      font-size:1.2rem;
+      padding: 8px 10px;
+      border-radius: 12px;
+      transition: background .15s ease;
+      user-select:none;
+    }
+    .trash:hover{ background: rgba(255,77,77,.12) }
+
+    .gallery{ display:flex; flex-direction:column; gap:10px; }
+    .main-shot{
+      width:100%;
+      border-radius:18px;
+      overflow:hidden;
+      border: 1px solid var(--border);
+      background:
+        radial-gradient(800px 380px at 50% 20%, rgba(96,165,250,.18), transparent 60%),
+        rgba(0,0,0,.18);
+      cursor:pointer;
+    }
+    .main-shot img{
+      width:100%;
+      height: 360px;
+      object-fit: contain;
+      padding: 16px;
+      display:block;
+    }
+    .thumbs{ display:flex; gap:10px; flex-wrap:wrap; }
+    .thumb{
+      width:92px; height:62px;
+      border-radius:14px;
+      overflow:hidden;
+      border:1px solid var(--border);
+      cursor:pointer;
+      opacity:.92;
+      transition: transform .14s ease, opacity .14s ease, border-color .14s ease;
+      background: rgba(0,0,0,.18);
+    }
+    .thumb:hover{ transform: translateY(-2px); opacity:1; border-color: rgba(96,165,250,.55); }
+    .thumb.active{ border-color: rgba(96,165,250,.75); opacity:1; }
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit: contain;
+      padding: 6px;
+      display:block;
+    }
+
+    .lightbox{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.72);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:999;
+      padding: 18px;
+    }
+    .lightbox.open{ display:flex; animation: fadeIn .18s ease both; }
+    @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+    .lightbox-inner{
+      max-width: 980px; width: 100%;
+      background: rgba(17,26,46,.96);
+      border:1px solid var(--border);
+      border-radius: 18px;
+      overflow:hidden;
+      box-shadow: 0 28px 80px rgba(0,0,0,.55);
+    }
+    .lightbox-top{
+      display:flex; justify-content:space-between; align-items:center;
+      padding: 12px 14px;
+      border-bottom:1px solid var(--border);
+    }
+    .lightbox-top b{ color: var(--active); }
+    .xbtn{
+      width:40px;height:40px;border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.25);
+      color:#fff;
+      cursor:pointer;
+      transition: transform .14s ease, background .14s ease;
+    }
+    .xbtn:hover{ transform: translateY(-1px); background: rgba(96,165,250,.18); }
+    .xbtn:active{ transform: translateY(0) scale(.98); }
+    .lightbox-img{ width:100%; height: 520px; object-fit: contain; padding: 18px; display:block; background: rgba(0,0,0,.22); }
+
+    .tiers{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 10px;
+    }
+    .tierbtn{
+      flex: 1 1 160px;
+      border-radius: 14px;
+      border: 1px solid rgba(96,165,250,.35);
+      background: rgba(96,165,250,.10);
+      color: #eaf1ff;
+      font-weight:1000;
+      padding: 12px 12px;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      user-select:none;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .tierbtn:hover{ transform: translateY(-2px); background: rgba(96,165,250,.16); }
+    .tierbtn.active{ background: rgba(96,165,250,.22); border-color: rgba(96,165,250,.75); }
+
+    footer{
+      opacity:.85;
+      border-top: 1px solid var(--border);
+      padding: 22px 20px;
+      text-align:center;
+    }
+
+    @media (max-width: 840px){
+      .filters{ grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px){
+      .hero h2{ font-size: 1.55rem }
+      .pill{ padding:9px 12px }
+      .main-shot img{ height: 280px; }
+      .lightbox-img{ height: 380px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="glow-orb"></div>
+  <div class="glow-orb two"></div>
+
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-inner">
+      <div class="lightbox-top">
+        <b id="lightboxTitle">Preview</b>
+        <button class="xbtn" id="lightboxClose" type="button"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <img id="lightboxImg" class="lightbox-img" src="" alt="Preview">
+    </div>
+  </div>
+
+  <header>
+    <div class="head-inner">
+      <div class="brand" data-go="#shop" title="Go to Shop">
+        <div class="brand-badge"><i class="fa-solid fa-bolt"></i></div>
+        <div>
+          <h1>FN Accounts</h1>
+          <p>instant delivery • stacked lockers • no cap fr</p>
+        </div>
+      </div>
+
+      <div class="nav">
+        <button class="pill" data-go="#shop" type="button"><i class="fa-solid fa-shop"></i> Shop</button>
+        <button class="pill" data-go="#categories" type="button"><i class="fa-solid fa-layer-group"></i> Categories</button>
+        <button class="pill" data-go="#tags" type="button"><i class="fa-solid fa-hashtag"></i> Tags</button>
+        <button class="pill" data-go="#payments" type="button"><i class="fa-solid fa-credit-card"></i> Payments</button>
+        <button class="pill cart-pill" data-go="#cart" type="button">
+          <i class="fa-solid fa-cart-shopping"></i> Cart
+          <span class="badge" id="cartCount">0</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="hero">
+      <h2>Chat… type a skin and it <span>locks in</span> 😭🗣️</h2>
+      <p class="sub">
+        Brainrot mode: ON. Search <b>Ikonik</b> / <b>Lara</b> / <b>Renegade</b> etc and press
+        <span class="kbd">Enter</span> → it opens the skin page with pics + tier buttons that update price live (no page switch, no scam vibes).
+      </p>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="page active" id="page-shop">
+      <div class="panel">
+        <h3>Shop (sigma search engine)</h3>
+        <p class="muted">Type = filters. Enter = opens the skin page. We move.</p>
+
+        <div class="filters">
+          <div class="field">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input id="searchInput" list="skinList" placeholder="Search: Ikonik, Lara Croft, Travis Scott, Renegade Raider..." />
+            <datalist id="skinList"></datalist>
+          </div>
+
+          <div class="field">
+            <i class="fa-solid fa-tags"></i>
+            <select id="priceSelect">
+              <option value="all">All prices</option>
+              <option value="5000">₦5,000</option>
+              <option value="15000">₦15,000</option>
+              <option value="20000">₦20,000</option>
+              <option value="30000">₦30,000</option>
+              <option value="40000">₦40,000</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <i class="fa-solid fa-layer-group"></i>
+            <select id="categorySelect">
+              <option value="all">All categories</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="hint">
+          <span class="chip" data-go="#s/lara-croft"><i class="fa-solid fa-star"></i>Lara page</span>
+          <span class="chip" data-go="#s/ikonik"><i class="fa-solid fa-star"></i>Ikonik page</span>
+          <span class="chip" data-go="#s/renegade-raider"><i class="fa-solid fa-star"></i>Renegade page</span>
+          <span class="muted">Press <span class="kbd">Enter</span> to open the skin page. (W rizz)</span>
+        </div>
+      </div>
+
+      <div style="height:14px"></div>
+      <div class="grid" id="shopGrid"></div>
+    </section>
+
+    <section class="page" id="page-categories">
+      <div class="panel">
+        <h3>Categories</h3>
+        <p class="muted">Route examples: <b>#c/budget</b></p>
+      </div>
+      <div style="height:14px"></div>
+      <div class="grid" id="categoryTiles"></div>
+    </section>
+
+    <section class="page" id="page-category">
+      <div class="panel">
+        <h3 id="catTitle">Category</h3>
+        <p class="muted" id="catSub"></p>
+      </div>
+      <div style="height:14px"></div>
+      <div class="grid" id="catGrid"></div>
+    </section>
+
+    <section class="page" id="page-tags">
+      <div class="panel">
+        <h3>Tags</h3>
+        <p class="muted">Tap a tag → <b>#t/rare</b></p>
+      </div>
+      <div style="height:14px"></div>
+      <div class="panel">
+        <div id="tagChips" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-tag">
+      <div class="panel">
+        <h3 id="tagTitle">Tag</h3>
+        <p class="muted" id="tagSub"></p>
+      </div>
+      <div style="height:14px"></div>
+      <div class="grid" id="tagGrid"></div>
+    </section>
+
+    <section class="page" id="page-skin">
+      <div class="panel">
+        <h3 id="skinTitle">Skin</h3>
+        <p class="muted" id="skinSub"></p>
+      </div>
+      <div style="height:14px"></div>
+      <div class="grid" id="skinWrap"></div>
+    </section>
+
+    <section class="page" id="page-cart">
+      <div class="panel">
+        <h3>Your Cart</h3>
+        <p class="muted">Lock in your tiers then checkout 🗣️</p>
+        <div style="height:12px"></div>
+        <div id="cartItems"></div>
+        <div style="height:12px"></div>
+        <div style="font-weight:1000" id="cartTotal">Subtotal: ₦0</div>
+        <div style="height:14px"></div>
+        <div class="grid">
+          <button class="btn btn-primary" data-go="#checkout" type="button"><i class="fa-solid fa-arrow-right"></i> Proceed to Checkout</button>
+          <button class="btn btn-danger" id="clearCartBtn" type="button"><i class="fa-solid fa-trash"></i> Clear Cart</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-checkout">
+      <div class="panel">
+        <h3>Checkout</h3>
+        <p class="muted">Pay → send proof on WhatsApp → instant delivery (we’re so back).</p>
+        <div style="height:12px"></div>
+        <div id="checkoutItems"></div>
+        <div style="height:12px"></div>
+        <div style="font-weight:1000" id="checkoutTotal">Total: ₦0</div>
+        <div style="height:14px"></div>
+        <div class="grid">
+          <button class="btn btn-primary" data-go="#payments" type="button"><i class="fa-solid fa-credit-card"></i> Payment Methods</button>
+          <button class="btn btn-muted" data-go="#cart" type="button"><i class="fa-solid fa-arrow-left"></i> Back to Cart</button>
+        </div>
+        <div style="height:14px"></div>
+        <button class="btn btn-accent" id="sendWhatsAppBtn" type="button"><i class="fa-brands fa-whatsapp"></i> Send Order on WhatsApp</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-payments">
+      <div class="panel">
+        <h3>Payment Methods</h3>
+        <p class="muted">Buttons open your links. (Don’t forget to replace the placeholders.)</p>
+        <div style="height:14px"></div>
+        <div class="grid" id="paymentGrid"></div>
+        <div style="height:14px"></div>
+        <div class="grid">
+          <button class="btn btn-primary" data-go="#checkout" type="button"><i class="fa-solid fa-arrow-left"></i> Back to Checkout</button>
+          <button class="btn btn-muted" data-go="#shop" type="button"><i class="fa-solid fa-shop"></i> Back to Shop</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>© 2026 Private Seller • all sales final • chat this is the meta</footer>
+
+  <script>
+    const CONFIG = {
+      whatsappPhone: "2349032052216",
+      paymentLinks: {
+        gpay: "https://example.com/your-gpay-link",
+        shop: "https://example.com/your-shop-link",
+        link: "https://example.com/your-custom-link",
+        paystack: "https://paystack.com/pay/YOUR_LINK",
+        flutterwave: "https://flutterwave.com/pay/YOUR_LINK"
+      }
+    };
+
+    // ✅ BEST TRICK: use Fandom “Special:FilePath” so you don’t need those long hashed URLs.
+    const wikiFile = (filename) => "https://fortnite.fandom.com/wiki/Special:FilePath/" + encodeURIComponent(filename);
+
+    const IMG = {
+      fallback: "https://fortnite.gg/img/game-br.jpg",
+
+      // ✅ Each skin gets its own individual image (not closeup because we use object-fit:contain)
+      laraCroft: wikiFile("Lara Croft - Outfit - Fortnite.png"),
+      ikonik: wikiFile("Ikonik - Outfit - Fortnite.png"),
+      travisScott: wikiFile("Travis Scott (New) - Outfit - Fortnite.png"),
+      astroJack: wikiFile("Astro Jack - Outfit - Fortnite.png"),
+      renegadeRaider: wikiFile("Renegade Raider - Outfit - Fortnite.png"),
+      aerialAssaultTrooper: wikiFile("Aerial Assault Trooper - Outfit - Fortnite.png"),
+      sparkleSpecialist: wikiFile("Sparkle Specialist - Outfit - Fortnite.png"),
+      omega: wikiFile("Omega - Outfit - Fortnite.png"),
+      reaper: wikiFile("The Reaper - Outfit - Fortnite.png"),
+      johnWick: wikiFile("John Wick - Outfit - Fortnite.png"),
+      galaxy: wikiFile("Galaxy - Outfit - Fortnite.png"),
+      wonder: wikiFile("Wonder - Outfit - Fortnite.png"),
+      wildcat: wikiFile("Wildcat - Outfit - Fortnite.png"),
+      reflex: wikiFile("Reflex - Outfit - Fortnite.png"),
+      skullTrooper: wikiFile("Skull Trooper - Outfit - Fortnite.png"),
+      ghoulTrooper: wikiFile("Ghoul Trooper - Outfit - Fortnite.png"),
+      blackKnight: wikiFile("Black Knight - Outfit - Fortnite.png"),
+
+      // non-outfit examples still get unique pics
+      mako: wikiFile("Mako - Glider - Fortnite.png"),
+      raidersRevenge: wikiFile("Raider's Revenge - Harvesting Tool - Fortnite.png"),
+      mintyAxe: wikiFile("Merry Mint Axe - Harvesting Tool - Fortnite.png"),
+      takeTheL: wikiFile("Take The L - Emote - Fortnite.png"),
+      floss: wikiFile("Floss - Emote - Fortnite.png")
+    };
+
+    // tier templates (you can change)
+    const DEFAULT_TIERS = [
+      { id:"25",  label:"25 skins",     price:10000 },
+      { id:"50",  label:"50 skins",     price:15000 },
+      { id:"100", label:"100+ skins",   price:25000 }
+    ];
+
+    // ✅ Every skin in search suggestions gets a real catalog entry with its own pic(s)
+    const SKIN_CATALOG = [
+      { slug:"lara-croft", name:"Lara Croft", aliases:["lara","lara croft","tomb raider"], images:[IMG.laraCroft, IMG.fallback, IMG.fallback], tags:["rare","collab"], tiers:[
+        { id:"25", label:"25 skins Lara account", price:10000 },
+        { id:"50", label:"50 skins Lara account", price:15000 },
+        { id:"100",label:"100+ skins Lara account", price:25000 }
+      ], note:"Pick a tier and watch the price morph mid-air like a Fortnite edit 😭" },
+
+      { slug:"ikonik", name:"Ikonik", aliases:["ikonik","ikonic","ik"], images:[IMG.ikonik, IMG.fallback, IMG.fallback], tags:["rare","samsung"], tiers:[
+        { id:"25", label:"25 skins Ikonik account", price:10000 },
+        { id:"50", label:"50 skins Ikonik account", price:16000 },
+        { id:"100",label:"100+ skins Ikonik account", price:28000 }
+      ], note:"Ikonik page: real pics + live tier price. No leaving page, just pure aura." },
+
+      { slug:"travis-scott", name:"Travis Scott", aliases:["travis","travis scott","astronomical"], images:[IMG.travisScott, IMG.astroJack, IMG.fallback], tags:["rare","icon"], tiers:[
+        { id:"25", label:"25 skins Travis account", price:12000 },
+        { id:"50", label:"50 skins Travis account", price:18000 },
+        { id:"100",label:"100+ skins Travis account", price:30000 }
+      ], note:"Travis + tier select = price updates instantly. Chat, we are COOKING." },
+
+      { slug:"renegade-raider", name:"Renegade Raider", aliases:["renegade","renegade raider"], images:[IMG.renegadeRaider, IMG.fallback, IMG.fallback], tags:["og","rare"], tiers: DEFAULT_TIERS,
+        note:"OG demon tier. Pick a tier and don’t blink." },
+
+      { slug:"aerial-assault-trooper", name:"Aerial Assault Trooper", aliases:["aerial assault","aerial assault trooper","aat"], images:[IMG.aerialAssaultTrooper, IMG.fallback, IMG.fallback], tags:["og","rare"], tiers: DEFAULT_TIERS },
+
+      { slug:"sparkle-specialist", name:"Sparkle Specialist", aliases:["sparkle specialist","sparkle"], images:[IMG.sparkleSpecialist, IMG.fallback, IMG.fallback], tags:["og","rare"], tiers: DEFAULT_TIERS },
+
+      { slug:"omega", name:"Omega", aliases:["omega"], images:[IMG.omega, IMG.fallback, IMG.fallback], tags:["rare"], tiers: DEFAULT_TIERS },
+
+      { slug:"the-reaper", name:"The Reaper", aliases:["the reaper","reaper"], images:[IMG.reaper, IMG.fallback, IMG.fallback], tags:["og","rare"], tiers: DEFAULT_TIERS },
+
+      { slug:"john-wick", name:"John Wick", aliases:["john wick","wick"], images:[IMG.johnWick, IMG.fallback, IMG.fallback], tags:["rare"], tiers: DEFAULT_TIERS },
+
+      { slug:"galaxy", name:"Galaxy", aliases:["galaxy"], images:[IMG.galaxy, IMG.fallback, IMG.fallback], tags:["rare","samsung"], tiers: DEFAULT_TIERS },
+
+      { slug:"wonder", name:"Wonder", aliases:["wonder"], images:[IMG.wonder, IMG.fallback, IMG.fallback], tags:["rare"], tiers: DEFAULT_TIERS },
+
+      { slug:"wildcat", name:"Wildcat", aliases:["wildcat"], images:[IMG.wildcat, IMG.fallback, IMG.fallback], tags:["rare"], tiers: DEFAULT_TIERS },
+
+      { slug:"reflex", name:"Reflex", aliases:["reflex"], images:[IMG.reflex, IMG.fallback, IMG.fallback], tags:["rare"], tiers: DEFAULT_TIERS },
+
+      { slug:"black-knight", name:"Black Knight", aliases:["black knight","bk"], images:[IMG.blackKnight, IMG.fallback, IMG.fallback], tags:["og","rare"], tiers: DEFAULT_TIERS },
+
+      { slug:"skull-trooper", name:"Skull Trooper", aliases:["skull trooper","skull","purple skull"], images:[IMG.skullTrooper, IMG.fallback, IMG.fallback], tags:["og","halloween","rare"], tiers: DEFAULT_TIERS },
+
+      { slug:"ghoul-trooper", name:"Ghoul Trooper", aliases:["ghoul trooper","ghoul","pink ghoul"], images:[IMG.ghoulTrooper, IMG.fallback, IMG.fallback], tags:["og","halloween","rare"], tiers: DEFAULT_TIERS },
+
+      // ✅ unique “cosmetic” pages too (still works with tiers)
+      { slug:"mako", name:"Mako (Glider)", aliases:["mako"], images:[IMG.mako, IMG.fallback, IMG.fallback], tags:["rare"], tiers: DEFAULT_TIERS },
+      { slug:"raiders-revenge", name:"Raider's Revenge (Pickaxe)", aliases:["raider's revenge","raiders revenge"], images:[IMG.raidersRevenge, IMG.fallback, IMG.fallback], tags:["rare","pickaxe"], tiers: DEFAULT_TIERS },
+      { slug:"minty-axe", name:"Minty Axe", aliases:["minty","minty axe","merry mint"], images:[IMG.mintyAxe, IMG.fallback, IMG.fallback], tags:["rare","pickaxe"], tiers: DEFAULT_TIERS },
+      { slug:"take-the-l", name:"Take The L (Emote)", aliases:["take the l","take l"], images:[IMG.takeTheL, IMG.fallback, IMG.fallback], tags:["rare","emote"], tiers: DEFAULT_TIERS },
+      { slug:"floss", name:"Floss (Emote)", aliases:["floss"], images:[IMG.floss, IMG.fallback, IMG.fallback], tags:["rare","emote"], tiers: DEFAULT_TIERS }
+    ];
+
+    const RARE_SKIN_SUGGESTIONS = [
+      "Ikonik","Lara Croft","Travis Scott","Renegade Raider","Aerial Assault Trooper","Sparkle Specialist",
+      "Omega","The Reaper","John Wick","Galaxy","Wonder","Wildcat","Reflex","Black Knight","Skull Trooper",
+      "Ghoul Trooper","Mako","Raider's Revenge","Minty Axe","Take The L","Floss"
+    ];
+
+    // shop products (budget options)
+    const PRODUCTS = [
+      { id:"p5k",  name:"₦5,000 Budget Account", category:"budget", price:5000,  stock:99, images:[IMG.fallback], tags:["budget","cheap"], skins:["Budget"] },
+      { id:"p15k", name:"₦15,000 Budget Account", category:"budget", price:15000, stock:50, images:[IMG.fallback], tags:["budget","cheap"], skins:["Budget"] },
+      { id:"p20k", name:"₦20,000 Budget Account", category:"budget", price:20000, stock:40, images:[IMG.fallback], tags:["budget","value"], skins:["Budget"] },
+      { id:"p30k", name:"₦30,000 Rare Mix",        category:"budget", price:30000, stock:25, images:[IMG.fallback], tags:["budget","rare"], skins:["Rare"] },
+      { id:"p40k", name:"₦40,000 Stacked Budget",  category:"budget", price:40000, stock:15, images:[IMG.fallback], tags:["budget","stacked"], skins:["Stacked"] }
+    ];
+
+    const $ = (s, root=document) => root.querySelector(s);
+    const $$ = (s, root=document) => Array.from(root.querySelectorAll(s));
+    const money = (n) => `₦${Number(n).toLocaleString()}`;
+    const norm = (s) => String(s||"").toLowerCase().trim();
+
+    function bumpBadge(){
+      const b = $("#cartCount");
+      b.classList.remove("bump");
+      void b.offsetWidth;
+      b.classList.add("bump");
+    }
+    function setActivePage(id){
+      $$(".page").forEach(p => p.classList.remove("active","page-enter"));
+      const el = $("#"+id);
+      if(el){ el.classList.add("active","page-enter"); window.scrollTo({top:0, behavior:"smooth"}); }
+    }
+    function go(h){ location.hash = h; }
+
+    function findSkinByQuery(q){
+      const nq = norm(q);
+      if(!nq) return null;
+
+      const slugGuess = nq.replace(/\s+/g,"-").replace(/[^a-z0-9-]/g,"");
+      const direct = SKIN_CATALOG.find(s => s.slug === slugGuess);
+      if(direct) return direct;
+
+      const byName = SKIN_CATALOG.find(s => norm(s.name) === nq);
+      if(byName) return byName;
+
+      const byAlias = SKIN_CATALOG.find(s =>
+        (s.aliases||[]).some(a => {
+          const na = norm(a);
+          return na === nq || nq.includes(na) || na.includes(nq);
+        })
+      );
+      if(byAlias) return byAlias;
+
+      // if it’s in suggestions but not catalog (shouldn’t happen now), still show something
+      const inSug = RARE_SKIN_SUGGESTIONS.some(x => {
+        const nx = norm(x);
+        return nx === nq || nq.includes(nx) || nx.includes(nq);
+      });
+      if(inSug){
+        return {
+          slug: slugGuess || "skin",
+          name: q.trim() || "Skin",
+          aliases:[q.trim()],
+          images:[IMG.fallback, IMG.fallback, IMG.fallback],
+          tags:["requested"],
+          tiers: DEFAULT_TIERS,
+          note:"Placeholder page. Add this skin to SKIN_CATALOG to give it a unique picture + custom prices."
+        };
+      }
+
+      return null;
+    }
+
+    // cart
+    let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    function saveCart(){
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCartCount();
+    }
+    function updateCartCount(){
+      const count = cart.reduce((s,i)=>s+i.qty,0);
+      $("#cartCount").textContent = count;
+    }
+    function addLineToCart(line){
+      const ex = cart.find(i => i.id === line.id);
+      if(ex) ex.qty++;
+      else cart.push({ ...line, qty: 1 });
+      saveCart();
+      bumpBadge();
+    }
+    function changeQty(id, delta){
+      const it = cart.find(i => i.id === id);
+      if(!it) return;
+      it.qty = Math.max(1, it.qty + delta);
+      saveCart();
+      renderCart();
+      renderCheckout();
+    }
+    function removeItem(id){
+      cart = cart.filter(i => i.id !== id);
+      saveCart();
+      renderCart();
+      renderCheckout();
+    }
+
+    // shop
+    function matchesFilters(p){
+      const q = norm($("#searchInput").value);
+      const price = $("#priceSelect").value;
+      const cat = $("#categorySelect").value;
+
+      if(cat !== "all" && p.category !== cat) return false;
+      if(price !== "all" && Number(p.price) !== Number(price)) return false;
+      if(!q) return true;
+
+      const hay = [p.name, p.category, ...(p.tags||[]), ...(p.skins||[])].map(norm).join(" | ");
+      return hay.includes(q);
+    }
+    function productCardHTML(p){
+      const hero = (p.images && p.images.length) ? p.images[0] : IMG.fallback;
+      const tagChips = (p.tags||[]).slice(0,4).map(t =>
+        `<span class="chip" data-go="#t/${encodeURIComponent(t)}"><i class="fa-solid fa-hashtag"></i>${t}</span>`
+      ).join("");
+      return `
+        <article class="card">
+          <img src="${hero}" alt="${p.name}">
+          <div class="body">
+            <h4>${p.name}</h4>
+            <div class="mini">
+              <span class="chip" data-go="#c/${encodeURIComponent(p.category)}"><i class="fa-solid fa-layer-group"></i>${p.category}</span>
+              ${tagChips}
+            </div>
+            <div class="price">${money(p.price)}</div>
+            <button class="btn btn-accent" data-addbudget="${p.id}" type="button"><i class="fa-solid fa-cart-plus"></i> Add to Cart (W)</button>
+            <div style="height:10px"></div>
+            <button class="btn btn-primary" data-buybudget="${p.id}" type="button"><i class="fa-solid fa-bolt"></i> Buy Now (aura)</button>
+          </div>
+        </article>
+      `;
+    }
+    function renderShop(){
+      const items = PRODUCTS.filter(matchesFilters);
+      $("#shopGrid").innerHTML = items.map(productCardHTML).join("") || `
+        <div class="panel" style="grid-column:1/-1;">
+          <h3>No results</h3>
+          <p class="muted">Try another name… or press Enter to open the skin page (lock in).</p>
+        </div>
+      `;
+    }
+    function getAllCategories(){ return [...new Set(PRODUCTS.map(p => p.category))].sort(); }
+    function renderCategorySelect(){
+      const cats = getAllCategories();
+      $("#categorySelect").innerHTML =
+        `<option value="all">All categories</option>` +
+        cats.map(c => `<option value="${c}">${c}</option>`).join("");
+    }
+    function renderCategories(){
+      const cats = getAllCategories();
+      $("#categoryTiles").innerHTML = cats.map(c => {
+        const count = PRODUCTS.filter(p=>p.category===c).length;
+        return `
+          <article class="card">
+            <img src="${IMG.fallback}" alt="${c}">
+            <div class="body">
+              <h4 style="text-transform:capitalize;">${c}</h4>
+              <p class="muted">${count} listing(s).</p>
+              <div style="height:10px"></div>
+              <button class="btn btn-primary" data-go="#c/${encodeURIComponent(c)}" type="button">
+                <i class="fa-solid fa-arrow-right"></i> Open Category Page
+              </button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+    function renderCategory(cat){
+      const items = PRODUCTS.filter(p => p.category === cat);
+      $("#catTitle").textContent = `Category: ${cat || "unknown"}`;
+      $("#catSub").textContent = items.length ? `Showing ${items.length} item(s).` : "No items in this category yet.";
+      $("#catGrid").innerHTML = items.map(productCardHTML).join("") || "";
+    }
+
+    // tags
+    function getAllTags(){
+      const set = new Set();
+      PRODUCTS.forEach(p => (p.tags||[]).forEach(t => set.add(t)));
+      SKIN_CATALOG.forEach(s => (s.tags||[]).forEach(t => set.add(t)));
+      return [...set].sort();
+    }
+    function renderTags(){
+      const tags = getAllTags();
+      $("#tagChips").innerHTML = tags.map(t =>
+        `<span class="chip" data-go="#t/${encodeURIComponent(t)}"><i class="fa-solid fa-hashtag"></i>${t}</span>`
+      ).join("");
+    }
+    function renderTag(tag){
+      const skins = SKIN_CATALOG.filter(s => (s.tags||[]).includes(tag));
+      $("#tagTitle").textContent = `Tag: #${tag || "unknown"}`;
+      $("#tagSub").textContent = `Skins: ${skins.length} (click one)`;
+      $("#tagGrid").innerHTML = skins.map(s => `
+        <article class="card">
+          <img src="${(s.images&&s.images[0])||IMG.fallback}" alt="${s.name}">
+          <div class="body">
+            <h4>${s.name}</h4>
+            <p class="muted">Open skin page + tier picker (price updates live).</p>
+            <div style="height:10px"></div>
+            <button class="btn btn-primary" data-go="#s/${encodeURIComponent(s.slug)}" type="button">
+              <i class="fa-solid fa-arrow-right"></i> Open Skin Page
+            </button>
+          </div>
+        </article>
+      `).join("") || "";
+    }
+
+    // skin page
+    let skinSelection = {}; // {slug: tierId}
+    function getSkinTier(slug){
+      const skin = SKIN_CATALOG.find(s => s.slug === slug) || findSkinByQuery(slug.replace(/-/g," "));
+      const tiers = skin?.tiers || DEFAULT_TIERS;
+      const chosenTierId = skinSelection[skin.slug] || tiers[0].id;
+      return { skin, tiers, tier: (tiers.find(t=>t.id===chosenTierId) || tiers[0]) };
+    }
+
+    function renderSkin(slug){
+      const skin = SKIN_CATALOG.find(x => x.slug === slug) || findSkinByQuery(slug.replace(/-/g," "));
+      if(!skin){
+        $("#skinTitle").textContent = "Skin not found";
+        $("#skinSub").textContent = "Try searching again.";
+        $("#skinWrap").innerHTML = `<div class="panel" style="grid-column:1/-1;">
+          <button class="btn btn-primary" data-go="#shop" type="button"><i class="fa-solid fa-shop"></i> Back to Shop</button></div>`;
+        return;
+      }
+
+      const imgs = (skin.images && skin.images.length) ? skin.images : [IMG.fallback, IMG.fallback, IMG.fallback];
+      const chosenTierId = skinSelection[skin.slug] || (skin.tiers?.[0]?.id || "25");
+      const tiers = skin.tiers || DEFAULT_TIERS;
+      const tier = tiers.find(t => t.id === chosenTierId) || tiers[0];
+
+      $("#skinTitle").textContent = skin.name;
+      $("#skinSub").textContent = skin.note || "Pick a tier (price updates instantly). Current brainrot: astronomical.";
+
+      const tagRow = (skin.tags||[]).map(t => `<span class="chip" data-go="#t/${encodeURIComponent(t)}"><i class="fa-solid fa-hashtag"></i>${t}</span>`).join("");
+
+      $("#skinWrap").innerHTML = `
+        <div class="panel" style="grid-column:1/-1;">
+          <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+
+            <div class="panel">
+              <div class="gallery">
+                <div class="main-shot" data-lightbox="1">
+                  <img id="skinMainImg" src="${imgs[0]}" alt="${skin.name}">
+                </div>
+                <div class="thumbs" id="skinThumbs">
+                  ${imgs.map((src, idx) => `
+                    <div class="thumb ${idx===0 ? "active" : ""}" data-thumb="${idx}">
+                      <img src="${src}" alt="thumb ${idx+1}">
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+              <div style="height:12px"></div>
+              <p class="muted">No closeup zoom. Pure clean render. (W aesthetic)</p>
+            </div>
+
+            <div class="card">
+              <img src="${imgs[0]}" alt="${skin.name}">
+              <div class="body">
+                <h4>${skin.name} Accounts</h4>
+                <div class="mini">
+                  ${tagRow || `<span class="chip"><i class="fa-solid fa-tag"></i>skin</span>`}
+                </div>
+
+                <div style="height:10px"></div>
+                <div class="panel" style="padding:14px;">
+                  <div style="display:flex; justify-content:space-between; gap:10px; align-items:center;">
+                    <div style="font-weight:1000;">Selected tier:</div>
+                    <div id="tierLabel" style="font-weight:1000; color:var(--active);">${tier.label}</div>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; margin-top:8px;">
+                    <div style="font-weight:1000;">Live price:</div>
+                    <div id="tierPrice" class="price" style="margin:0; font-size:1.5rem;">${money(tier.price)}</div>
+                  </div>
+
+                  <div class="tiers">
+                    ${tiers.map(t => `
+                      <button class="tierbtn ${t.id===tier.id ? "active" : ""}" data-tier="${t.id}" data-skinslug="${skin.slug}" type="button">
+                        <span>${t.label}</span>
+                        <span>${money(t.price)}</span>
+                      </button>
+                    `).join("")}
+                  </div>
+                </div>
+
+                <div style="height:12px"></div>
+
+                <button class="btn btn-accent" data-addskin="${skin.slug}" type="button">
+                  <i class="fa-solid fa-cart-plus"></i> Add Selected Tier (chat, LOCK IN)
+                </button>
+                <div style="height:10px"></div>
+                <button class="btn btn-primary" data-buyskin="${skin.slug}" type="button">
+                  <i class="fa-solid fa-bolt"></i> Buy Selected Tier → Checkout (aura++)
+                </button>
+                <div style="height:10px"></div>
+                <button class="btn btn-muted" data-go="#shop" type="button">
+                  <i class="fa-solid fa-arrow-left"></i> Back to Shop
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      `;
+
+      const thumbs = $("#skinThumbs");
+      if(thumbs){
+        thumbs.addEventListener("click", (e)=>{
+          const t = e.target.closest(".thumb");
+          if(!t) return;
+          const idx = Number(t.dataset.thumb);
+          const src = imgs[idx] || imgs[0];
+          $("#skinMainImg").src = src;
+          $$(".thumb", thumbs).forEach(x=>x.classList.remove("active"));
+          t.classList.add("active");
+        });
+      }
+    }
+
+    // cart UI
+    function renderCart(){
+      const wrap = $("#cartItems");
+      if(cart.length === 0){
+        wrap.innerHTML = `<p class="muted">Cart empty… tragic. Go shop 🗣️</p>
+          <div style="height:12px"></div>
+          <button class="btn btn-primary" data-go="#shop" type="button"><i class="fa-solid fa-shop"></i> Go → Shop</button>`;
+        $("#cartTotal").textContent = "Subtotal: ₦0";
+        return;
+      }
+      wrap.innerHTML = cart.map(item => `
+        <div class="row">
+          <div style="flex:1;">
+            <div style="font-weight:1000">${item.name}</div>
+            <div class="muted">${money(item.price)} × ${item.qty}</div>
+          </div>
+          <div class="qty">
+            <button class="qty-btn" data-qty="dec" data-id="${item.id}" type="button">-</button>
+            <span style="min-width:24px;text-align:center;font-weight:1000">${item.qty}</span>
+            <button class="qty-btn" data-qty="inc" data-id="${item.id}" type="button">+</button>
+            <span class="trash" data-remove="${item.id}" title="Remove"><i class="fa-solid fa-trash"></i></span>
+          </div>
+        </div>
+      `).join("");
+      const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+      $("#cartTotal").textContent = `Subtotal: ${money(total)}`;
+    }
+
+    function renderCheckout(){
+      const wrap = $("#checkoutItems");
+      if(cart.length === 0){
+        wrap.innerHTML = `<p class="muted">Cart empty. Go shop first.</p>
+          <div style="height:12px"></div>
+          <button class="btn btn-primary" data-go="#shop" type="button"><i class="fa-solid fa-shop"></i> Shop</button>`;
+        $("#checkoutTotal").textContent = "Total: ₦0";
+        return;
+      }
+      wrap.innerHTML = cart.map(item => `
+        <div class="row">
+          <div style="flex:1;">
+            <div style="font-weight:1000">${item.name}</div>
+            <div class="muted">${money(item.price)} × ${item.qty}</div>
+          </div>
+          <div style="font-weight:1000">${money(item.price*item.qty)}</div>
+        </div>
+      `).join("");
+      const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+      $("#checkoutTotal").textContent = `Total: ${money(total)}`;
+    }
+
+    function renderPayments(){
+      const cards = [
+        { title:"GPay", icon:"fa-brands fa-google-pay", desc:"Paste your real link in CONFIG.paymentLinks.gpay.", link: CONFIG.paymentLinks.gpay },
+        { title:"Shop", icon:"fa-solid fa-bag-shopping", desc:"Paste your store/shop link in CONFIG.paymentLinks.shop.", link: CONFIG.paymentLinks.shop },
+        { title:"Link", icon:"fa-solid fa-link", desc:"Paste your custom checkout link in CONFIG.paymentLinks.link.", link: CONFIG.paymentLinks.link },
+        { title:"Paystack", icon:"fa-solid fa-bolt", desc:"Paste your Paystack link in CONFIG.paymentLinks.paystack.", link: CONFIG.paymentLinks.paystack },
+        { title:"Flutterwave", icon:"fa-solid fa-bolt", desc:"Paste your Flutterwave link in CONFIG.paymentLinks.flutterwave.", link: CONFIG.paymentLinks.flutterwave }
+      ];
+      $("#paymentGrid").innerHTML = cards.map(c => `
+        <div class="panel">
+          <h3><i class="${c.icon}"></i> ${c.title}</h3>
+          <p class="muted">${c.desc}</p>
+          <div style="height:12px"></div>
+          <button class="btn btn-primary" data-open="${c.link}" type="button">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Payment Page
+          </button>
+        </div>
+      `).join("");
+    }
+
+    // router
+    function route(){
+      const hash = (location.hash || "#shop").replace("#","");
+      if(hash.startsWith("c/")){
+        const cat = decodeURIComponent(hash.split("/")[1] || "");
+        renderCategory(cat);
+        setActivePage("page-category");
+        return;
+      }
+      if(hash.startsWith("t/")){
+        const tag = decodeURIComponent(hash.split("/")[1] || "");
+        renderTag(tag);
+        setActivePage("page-tag");
+        return;
+      }
+      if(hash.startsWith("s/")){
+        const slug = decodeURIComponent(hash.split("/")[1] || "");
+        renderSkin(slug);
+        setActivePage("page-skin");
+        return;
+      }
+      switch(hash){
+        case "shop": renderShop(); setActivePage("page-shop"); break;
+        case "categories": renderCategories(); setActivePage("page-categories"); break;
+        case "tags": renderTags(); setActivePage("page-tags"); break;
+        case "cart": renderCart(); setActivePage("page-cart"); break;
+        case "checkout": renderCheckout(); setActivePage("page-checkout"); break;
+        case "payments": renderPayments(); setActivePage("page-payments"); break;
+        default: location.hash = "#shop";
+      }
+    }
+
+    // lightbox
+    function openLightbox(title, src){
+      $("#lightboxTitle").textContent = title;
+      $("#lightboxImg").src = src;
+      $("#lightbox").classList.add("open");
+    }
+    function closeLightbox(){
+      $("#lightbox").classList.remove("open");
+      $("#lightboxImg").src = "";
+    }
+
+    // events
+    document.addEventListener("click", (e)=>{
+      const goBtn = e.target.closest("[data-go]");
+      if(goBtn) return (location.hash = goBtn.dataset.go);
+
+      const openBtn = e.target.closest("[data-open]");
+      if(openBtn){
+        const url = openBtn.dataset.open || "";
+        if(!url || url.includes("example.com") || url.includes("YOUR_LINK")){
+          return alert("Put your real payment links in CONFIG.paymentLinks.");
+        }
+        window.open(url, "_blank");
+        return;
+      }
+
+      const addB = e.target.closest("[data-addbudget]");
+      if(addB){
+        const id = addB.dataset.addbudget;
+        const p = PRODUCTS.find(x=>x.id===id);
+        if(!p) return;
+        addLineToCart({ id:`budget:${p.id}`, name:p.name, price:p.price });
+        return (location.hash = "#cart");
+      }
+      const buyB = e.target.closest("[data-buybudget]");
+      if(buyB){
+        const id = buyB.dataset.buybudget;
+        const p = PRODUCTS.find(x=>x.id===id);
+        if(!p) return;
+        cart = [{ id:`budget:${p.id}`, name:p.name, price:p.price, qty:1 }];
+        saveCart(); bumpBadge();
+        return (location.hash = "#checkout");
+      }
+
+      const tierBtn = e.target.closest("[data-tier][data-skinslug]");
+      if(tierBtn){
+        const slug = tierBtn.dataset.skinslug;
+        const tierId = tierBtn.dataset.tier;
+        skinSelection[slug] = tierId;
+
+        const skin = SKIN_CATALOG.find(s=>s.slug===slug);
+        const tiers = skin?.tiers || DEFAULT_TIERS;
+        const tier = tiers.find(t=>t.id===tierId) || tiers[0];
+
+        $("#tierLabel").textContent = tier.label;
+        $("#tierPrice").textContent = money(tier.price);
+        $$(".tierbtn").forEach(b => b.classList.toggle("active", b.dataset.tier === tierId));
+        return;
+      }
+
+      const addSkin = e.target.closest("[data-addskin]");
+      if(addSkin){
+        const slug = addSkin.dataset.addskin;
+        const { skin, tier } = (() => {
+          const s = SKIN_CATALOG.find(x=>x.slug===slug);
+          const tiers = s?.tiers || DEFAULT_TIERS;
+          const chosen = skinSelection[slug] || tiers[0].id;
+          return { skin: s, tier: (tiers.find(t=>t.id===chosen) || tiers[0]) };
+        })();
+        addLineToCart({ id:`skin:${slug}:${tier.id}`, name:`${skin.name} • ${tier.label}`, price:tier.price });
+        return (location.hash = "#cart");
+      }
+
+      const buySkin = e.target.closest("[data-buyskin]");
+      if(buySkin){
+        const slug = buySkin.dataset.buyskin;
+        const s = SKIN_CATALOG.find(x=>x.slug===slug);
+        const tiers = s?.tiers || DEFAULT_TIERS;
+        const chosen = skinSelection[slug] || tiers[0].id;
+        const tier = tiers.find(t=>t.id===chosen) || tiers[0];
+        cart = [{ id:`skin:${slug}:${tier.id}`, name:`${s.name} • ${tier.label}`, price:tier.price, qty:1 }];
+        saveCart(); bumpBadge();
+        return (location.hash = "#checkout");
+      }
+
+      const qtyBtn = e.target.closest("[data-qty]");
+      if(qtyBtn){
+        const id = qtyBtn.dataset.id;
+        if(qtyBtn.dataset.qty === "inc") changeQty(id, +1);
+        if(qtyBtn.dataset.qty === "dec") changeQty(id, -1);
+        return;
+      }
+
+      const remBtn = e.target.closest("[data-remove]");
+      if(remBtn){ removeItem(remBtn.dataset.remove); return; }
+
+      const main = e.target.closest("[data-lightbox]");
+      if(main){
+        const img = $("#skinMainImg");
+        if(img) openLightbox($("#skinTitle").textContent || "Preview", img.src);
+        return;
+      }
+    });
+
+    $("#clearCartBtn").addEventListener("click", ()=>{
+      if(confirm("Clear entire cart?")){
+        cart = [];
+        saveCart();
+        renderCart();
+        renderCheckout();
+      }
+    });
+
+    $("#sendWhatsAppBtn").addEventListener("click", ()=>{
+      if(cart.length === 0) return alert("Cart is empty.");
+      const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+      const lines = cart.map(i => `• ${i.name} x${i.qty} — ₦${(i.price*i.qty).toLocaleString()}`).join('%0A');
+      const msg = `Hello, I want to buy:%0A${lines}%0A%0ATotal: ₦${total.toLocaleString()}%0A%0APlease send payment details + delivery steps.`;
+      window.open(`https://wa.me/${CONFIG.whatsappPhone}?text=${msg}`, "_blank");
+    });
+
+    $("#lightboxClose").addEventListener("click", closeLightbox);
+    $("#lightbox").addEventListener("click", (e)=>{ if(e.target.id === "lightbox") closeLightbox(); });
+    document.addEventListener("keydown", (e)=>{ if(e.key === "Escape") closeLightbox(); });
+
+    window.addEventListener("hashchange", route);
+
+    // ✅ Search behavior:
+    // typing filters shop, Enter opens skin page
+    function openSkinFromSearch(){
+      const q = $("#searchInput").value;
+      const skin = findSkinByQuery(q);
+      if(skin){
+        return (location.hash = "#s/" + encodeURIComponent(skin.slug));
+      }
+      renderShop();
+    }
+
+    function wireFilters(){
+      $("#searchInput").addEventListener("input", ()=>renderShop());
+      $("#searchInput").addEventListener("keydown", (e)=>{
+        if(e.key === "Enter"){
+          e.preventDefault();
+          openSkinFromSearch();
+        }
+      });
+      $("#searchInput").addEventListener("change", ()=>openSkinFromSearch());
+      $("#priceSelect").addEventListener("change", ()=>renderShop());
+      $("#categorySelect").addEventListener("change", ()=>renderShop());
+    }
+
+    function renderSkinDatalist(){
+      const set = new Set();
+      RARE_SKIN_SUGGESTIONS.forEach(x=>set.add(x));
+      SKIN_CATALOG.forEach(s=>set.add(s.name));
+      $("#skinList").innerHTML = [...set].sort().map(s => `<option value="${s}"></option>`).join("");
+    }
+
+    function boot(){
+      updateCartCount();
+      renderSkinDatalist();
+      renderCategorySelect();
+      renderCategories();
+      renderTags();
+      renderPayments();
+      wireFilters();
+      renderShop();
+      route();
+    }
+    boot();
+  </script>
+</body>
+</html>
